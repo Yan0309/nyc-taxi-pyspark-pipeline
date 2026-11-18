@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 import pytest
 from pyspark.sql import Row, SparkSession
 from pyspark.sql import functions as F
@@ -32,8 +30,8 @@ def spark():
 def source_frame(spark: SparkSession):
     rows = [
         Row(
-            tpep_pickup_datetime=datetime(2023, 6, 1, 17, 0),
-            tpep_dropoff_datetime=datetime(2023, 6, 1, 17, 20),
+            tpep_pickup_datetime="2023-06-01 17:00:00",
+            tpep_dropoff_datetime="2023-06-01 17:20:00",
             passenger_count=1,
             trip_distance=2.0,
             RatecodeID=1,
@@ -45,8 +43,8 @@ def source_frame(spark: SparkSession):
             total_amount=15.0,
         ),
         Row(
-            tpep_pickup_datetime=datetime(2024, 7, 1, 18, 0),
-            tpep_dropoff_datetime=datetime(2024, 7, 1, 18, 30),
+            tpep_pickup_datetime="2024-07-01 18:00:00",
+            tpep_dropoff_datetime="2024-07-01 18:30:00",
             passenger_count=2,
             trip_distance=5.0,
             RatecodeID=2,
@@ -58,8 +56,8 @@ def source_frame(spark: SparkSession):
             total_amount=25.0,
         ),
         Row(
-            tpep_pickup_datetime=datetime(2024, 7, 1, 19, 0),
-            tpep_dropoff_datetime=datetime(2024, 7, 1, 19, 10),
+            tpep_pickup_datetime="2024-07-01 19:00:00",
+            tpep_dropoff_datetime="2024-07-01 19:10:00",
             passenger_count=0,
             trip_distance=1.0,
             RatecodeID=1,
@@ -71,8 +69,8 @@ def source_frame(spark: SparkSession):
             total_amount=10.0,
         ),
         Row(
-            tpep_pickup_datetime=datetime(2022, 7, 1, 19, 0),
-            tpep_dropoff_datetime=datetime(2022, 7, 1, 19, 10),
+            tpep_pickup_datetime="2022-07-01 19:00:00",
+            tpep_dropoff_datetime="2022-07-01 19:10:00",
             passenger_count=1,
             trip_distance=1.0,
             RatecodeID=1,
@@ -84,8 +82,8 @@ def source_frame(spark: SparkSession):
             total_amount=10.0,
         ),
         Row(
-            tpep_pickup_datetime=datetime(2024, 8, 1, 12, 0),
-            tpep_dropoff_datetime=datetime(2024, 8, 1, 16, 0),
+            tpep_pickup_datetime="2024-08-01 12:00:00",
+            tpep_dropoff_datetime="2024-08-01 16:00:00",
             passenger_count=1,
             trip_distance=10.0,
             RatecodeID=1,
