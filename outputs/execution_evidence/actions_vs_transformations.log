@@ -1,0 +1,11 @@
+Jobs before building the plan: 0
+Building a chain of transformations withColumn -> filter -> select ...
+Jobs after building the plan: 0
+No data was read because transformations only update the logical plan.
+
+Physical plan before an action:
+
+Calling take(5) to trigger an eager action ...
+Rows returned by take(5): [Row(id=0, value=0), Row(id=5, value=10), Row(id=10, value=20), Row(id=15, value=30), Row(id=20, value=40)]
+Jobs after the action: 1 (jobs launched: 1)
+A Spark job runs only when an action such as take, show, count, write, or collect requests a result.

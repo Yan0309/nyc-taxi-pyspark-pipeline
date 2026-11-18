@@ -1,0 +1,134 @@
+{
+  "generated_at_utc": "2026-11-18T19:08:52.846799+00:00",
+  "spark_version": "3.5.5",
+  "config": {
+    "input_glob": "data/raw/yellow_tripdata_*.parquet",
+    "zone_lookup": "data/raw/taxi_zone_lookup.csv",
+    "output_dir": "artifacts/run",
+    "master": "local[*]",
+    "shuffle_partitions": 48,
+    "sample_fraction": 1.0,
+    "ui_pause_seconds": 0,
+    "skip_cache_benchmark": false
+  },
+  "source": {
+    "pattern": "data/raw/yellow_tripdata_*.parquet",
+    "files": 20,
+    "compressed_bytes": 1122973488,
+    "compressed_gib": 1.046
+  },
+  "data": {
+    "clean_trip_count": 63510285,
+    "gross_revenue": 1839095164.93,
+    "min_pickup_date": "2023-05-01",
+    "max_pickup_date": "2024-12-31",
+    "metrics_row_count": 1576855
+  },
+  "top_evening_zones": [
+    {
+      "pickup_borough": "Queens",
+      "pickup_zone": "JFK Airport",
+      "total_trips": 821195,
+      "gross_revenue": 70117771.23,
+      "revenue_per_trip": 85.39,
+      "avg_distance_miles": 16.38,
+      "tip_pct_of_fare": 14.75
+    },
+    {
+      "pickup_borough": "Queens",
+      "pickup_zone": "LaGuardia Airport",
+      "total_trips": 530513,
+      "gross_revenue": 35859493.37,
+      "revenue_per_trip": 67.59,
+      "avg_distance_miles": 9.61,
+      "tip_pct_of_fare": 21.12
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Midtown Center",
+      "total_trips": 942965,
+      "gross_revenue": 23389389.95,
+      "revenue_per_trip": 24.8,
+      "avg_distance_miles": 2.13,
+      "tip_pct_of_fare": 20.16
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Upper East Side South",
+      "total_trips": 807791,
+      "gross_revenue": 17502998.33,
+      "revenue_per_trip": 21.67,
+      "avg_distance_miles": 1.8,
+      "tip_pct_of_fare": 21.31
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Midtown East",
+      "total_trips": 688997,
+      "gross_revenue": 16954713.47,
+      "revenue_per_trip": 24.61,
+      "avg_distance_miles": 2.15,
+      "tip_pct_of_fare": 20.88
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Upper East Side North",
+      "total_trips": 667225,
+      "gross_revenue": 14666322.94,
+      "revenue_per_trip": 21.98,
+      "avg_distance_miles": 1.96,
+      "tip_pct_of_fare": 20.93
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Times Sq/Theatre District",
+      "total_trips": 555972,
+      "gross_revenue": 14666029.2,
+      "revenue_per_trip": 26.38,
+      "avg_distance_miles": 2.42,
+      "tip_pct_of_fare": 18.88
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Midtown North",
+      "total_trips": 548333,
+      "gross_revenue": 13347452.2,
+      "revenue_per_trip": 24.34,
+      "avg_distance_miles": 2.09,
+      "tip_pct_of_fare": 20.11
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Penn Station/Madison Sq West",
+      "total_trips": 496306,
+      "gross_revenue": 13300745.78,
+      "revenue_per_trip": 26.8,
+      "avg_distance_miles": 2.37,
+      "tip_pct_of_fare": 19.6
+    },
+    {
+      "pickup_borough": "Manhattan",
+      "pickup_zone": "Murray Hill",
+      "total_trips": 527021,
+      "gross_revenue": 12918892.04,
+      "revenue_per_trip": 24.51,
+      "avg_distance_miles": 2.18,
+      "tip_pct_of_fare": 19.94
+    }
+  ],
+  "timings_seconds": {
+    "zone_hour_metrics_write": 58.725,
+    "cache_query_uncached": 1.003,
+    "cache_materialize": 2.496,
+    "cache_query_cached": 0.529,
+    "top_evening_zones_output": 0.629,
+    "daily_borough_output": 1.047,
+    "metrics_summary_query": 0.544
+  },
+  "outputs": {
+    "zone_hour_metrics": "artifacts/run/results/zone_hour_metrics.parquet",
+    "top_evening_zones": "artifacts/run/results/top_evening_zones.parquet",
+    "daily_borough_metrics": "artifacts/run/results/daily_borough_metrics.parquet",
+    "plans": "artifacts/run/plans"
+  }
+}

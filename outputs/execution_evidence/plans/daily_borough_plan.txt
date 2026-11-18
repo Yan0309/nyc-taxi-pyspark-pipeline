@@ -1,0 +1,90 @@
+== Physical Plan ==
+AdaptiveSparkPlan (9)
++- Sort (8)
+   +- Exchange (7)
+      +- HashAggregate (6)
+         +- Exchange (5)
+            +- HashAggregate (4)
+               +- Project (3)
+                  +- Filter (2)
+                     +- Scan parquet  (1)
+
+
+(1) Scan parquet
+Output [9]: [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L, pickup_month#525]
+Batched: true
+Location: InMemoryFileIndex [file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-processing-pipeline/artifacts/run/results/zone_hour_metrics.parquet]
+PushedFilters: [IsNotNull(pickup_date), GreaterThanOrEqual(pickup_date,2023-05-01), LessThan(pickup_date,2025-01-01)]
+ReadSchema: struct<pickup_date:date,pickup_borough:string,trip_count:bigint,gross_revenue:double,fare_revenue:double,tip_revenue:double,avg_duration_minutes:double,airport_trips:bigint>
+
+(2) Filter
+Input [9]: [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L, pickup_month#525]
+Condition : ((isnotnull(pickup_date#509) AND (pickup_date#509 >= 2023-05-01)) AND (pickup_date#509 < 2025-01-01))
+
+(3) Project
+Output [8]: [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L]
+Input [9]: [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L, pickup_month#525]
+
+(4) HashAggregate
+Input [8]: [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L]
+Keys [2]: [pickup_date#509, pickup_borough#512]
+Functions [6]: [partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_sum(airport_trips#522L), partial_sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)]
+Aggregate Attributes [6]: [sum#602L, sum#603, sum#604L, sum#605, sum#606, sum#607]
+Results [8]: [pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613]
+
+(5) Exchange
+Input [8]: [pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613]
+Arguments: hashpartitioning(pickup_date#509, pickup_borough#512, 48), ENSURE_REQUIREMENTS, [plan_id=463]
+
+(6) HashAggregate
+Input [8]: [pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613]
+Keys [2]: [pickup_date#509, pickup_borough#512]
+Functions [6]: [sum(trip_count#515L), sum(gross_revenue#516), sum(airport_trips#522L), sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), sum(tip_revenue#518), sum(fare_revenue#517)]
+Aggregate Attributes [6]: [sum(trip_count#515L)#567L, sum(gross_revenue#516)#568, sum(airport_trips#522L)#569L, sum((cast(trip_count#515L as double) * avg_duration_minutes#520))#573, sum(tip_revenue#518)#571, sum(fare_revenue#517)#572]
+Results [7]: [pickup_date#509, pickup_borough#512, sum(trip_count#515L)#567L AS trip_count#562L, round(sum(gross_revenue#516)#568, 2) AS gross_revenue#563, round(sum(airport_trips#522L)#569L, 0) AS airport_trips#564L, round((sum((cast(trip_count#515L as double) * avg_duration_minutes#520))#573 / cast(sum(trip_count#515L)#567L as double)), 2) AS weighted_avg_duration_minutes#565, round(((100.0 * sum(tip_revenue#518)#571) / sum(fare_revenue#517)#572), 2) AS tip_pct_of_fare#566]
+
+(7) Exchange
+Input [7]: [pickup_date#509, pickup_borough#512, trip_count#562L, gross_revenue#563, airport_trips#564L, weighted_avg_duration_minutes#565, tip_pct_of_fare#566]
+Arguments: rangepartitioning(pickup_date#509 ASC NULLS FIRST, pickup_borough#512 ASC NULLS FIRST, 48), ENSURE_REQUIREMENTS, [plan_id=466]
+
+(8) Sort
+Input [7]: [pickup_date#509, pickup_borough#512, trip_count#562L, gross_revenue#563, airport_trips#564L, weighted_avg_duration_minutes#565, tip_pct_of_fare#566]
+Arguments: [pickup_date#509 ASC NULLS FIRST, pickup_borough#512 ASC NULLS FIRST], true, 0
+
+(9) AdaptiveSparkPlan
+Output [7]: [pickup_date#509, pickup_borough#512, trip_count#562L, gross_revenue#563, airport_trips#564L, weighted_avg_duration_minutes#565, tip_pct_of_fare#566]
+Arguments: isFinalPlan=false
+
+
+== Parsed Logical Plan ==
+'Sort ['pickup_date ASC NULLS FIRST, 'pickup_borough ASC NULLS FIRST], true
++- 'Aggregate ['pickup_date, 'pickup_borough], ['pickup_date, 'pickup_borough, 'SUM('trip_count) AS trip_count#562, 'ROUND('SUM('gross_revenue), 2) AS gross_revenue#563, 'ROUND('SUM('airport_trips), 0) AS airport_trips#564, 'ROUND(('SUM(('trip_count * 'avg_duration_minutes)) / 'SUM('trip_count)), 2) AS weighted_avg_duration_minutes#565, 'ROUND(((100 * 'SUM('tip_revenue)) / 'SUM('fare_revenue)), 2) AS tip_pct_of_fare#566]
+   +- 'Filter (('pickup_date >= 2023-05-01) AND ('pickup_date < 2025-01-01))
+      +- 'UnresolvedRelation [zone_hour_metrics], [], false
+
+== Analyzed Logical Plan ==
+pickup_date: date, pickup_borough: string, trip_count: bigint, gross_revenue: double, airport_trips: bigint, weighted_avg_duration_minutes: double, tip_pct_of_fare: double
+Sort [pickup_date#509 ASC NULLS FIRST, pickup_borough#512 ASC NULLS FIRST], true
++- Aggregate [pickup_date#509, pickup_borough#512], [pickup_date#509, pickup_borough#512, sum(trip_count#515L) AS trip_count#562L, round(sum(gross_revenue#516), 2) AS gross_revenue#563, round(sum(airport_trips#522L), 0) AS airport_trips#564L, round((sum((cast(trip_count#515L as double) * avg_duration_minutes#520)) / cast(sum(trip_count#515L) as double)), 2) AS weighted_avg_duration_minutes#565, round(((cast(100 as double) * sum(tip_revenue#518)) / sum(fare_revenue#517)), 2) AS tip_pct_of_fare#566]
+   +- Filter ((pickup_date#509 >= 2023-05-01) AND (pickup_date#509 < 2025-01-01))
+      +- SubqueryAlias zone_hour_metrics
+         +- View (`zone_hour_metrics`, [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525])
+            +- Relation [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525] parquet
+
+== Optimized Logical Plan ==
+Sort [pickup_date#509 ASC NULLS FIRST, pickup_borough#512 ASC NULLS FIRST], true
++- Aggregate [pickup_date#509, pickup_borough#512], [pickup_date#509, pickup_borough#512, sum(trip_count#515L) AS trip_count#562L, round(sum(gross_revenue#516), 2) AS gross_revenue#563, round(sum(airport_trips#522L), 0) AS airport_trips#564L, round((sum((cast(trip_count#515L as double) * avg_duration_minutes#520)) / cast(sum(trip_count#515L) as double)), 2) AS weighted_avg_duration_minutes#565, round(((100.0 * sum(tip_revenue#518)) / sum(fare_revenue#517)), 2) AS tip_pct_of_fare#566]
+   +- Project [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L]
+      +- Filter (isnotnull(pickup_date#509) AND ((pickup_date#509 >= 2023-05-01) AND (pickup_date#509 < 2025-01-01)))
+         +- Relation [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [pickup_date#509 ASC NULLS FIRST, pickup_borough#512 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(pickup_date#509 ASC NULLS FIRST, pickup_borough#512 ASC NULLS FIRST, 48), ENSURE_REQUIREMENTS, [plan_id=466]
+      +- HashAggregate(keys=[pickup_date#509, pickup_borough#512], functions=[sum(trip_count#515L), sum(gross_revenue#516), sum(airport_trips#522L), sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), sum(tip_revenue#518), sum(fare_revenue#517)], output=[pickup_date#509, pickup_borough#512, trip_count#562L, gross_revenue#563, airport_trips#564L, weighted_avg_duration_minutes#565, tip_pct_of_fare#566])
+         +- Exchange hashpartitioning(pickup_date#509, pickup_borough#512, 48), ENSURE_REQUIREMENTS, [plan_id=463]
+            +- HashAggregate(keys=[pickup_date#509, pickup_borough#512], functions=[partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_sum(airport_trips#522L), partial_sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)], output=[pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613])
+               +- Project [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L]
+                  +- Filter ((isnotnull(pickup_date#509) AND (pickup_date#509 >= 2023-05-01)) AND (pickup_date#509 < 2025-01-01))
+                     +- FileScan parquet [pickup_date#509,pickup_borough#512,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_duration_minutes#520,airport_trips#522L,pickup_month#525] Batched: true, DataFilters: [isnotnull(pickup_date#509), (pickup_date#509 >= 2023-05-01), (pickup_date#509 < 2025-01-01)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-proces..., PartitionFilters: [], PushedFilters: [IsNotNull(pickup_date), GreaterThanOrEqual(pickup_date,2023-05-01), LessThan(pickup_date,2025-01..., ReadSchema: struct<pickup_date:date,pickup_borough:string,trip_count:bigint,gross_revenue:double,fare_revenue...

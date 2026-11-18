@@ -1,0 +1,21 @@
+"pickup_borough","pickup_zone","total_trips","gross_revenue","revenue_per_trip","avg_distance_miles","tip_pct_of_fare"
+"Queens","JFK Airport",821195,70117771.23,85.39,16.38,14.75
+"Queens","LaGuardia Airport",530513,35859493.37,67.59,9.61,21.12
+"Manhattan","Midtown Center",942965,23389389.95,24.8,2.13,20.16
+"Manhattan","Upper East Side South",807791,17502998.33,21.67,1.8,21.31
+"Manhattan","Midtown East",688997,16954713.47,24.61,2.15,20.88
+"Manhattan","Upper East Side North",667225,14666322.94,21.98,1.96,20.93
+"Manhattan","Times Sq/Theatre District",555972,14666029.2,26.38,2.42,18.88
+"Manhattan","Midtown North",548333,13347452.2,24.34,2.09,20.11
+"Manhattan","Penn Station/Madison Sq West",496306,13300745.78,26.8,2.37,19.6
+"Manhattan","Murray Hill",527021,12918892.04,24.51,2.18,19.94
+"Manhattan","East Chelsea",479601,12503346.05,26.07,2.4,19.68
+"Manhattan","Lincoln Square East",551802,12362908.55,22.4,2.02,20.93
+"Manhattan","Union Sq",514101,12023270.06,23.39,1.96,20.68
+"Manhattan","Midtown South",407472,10000479.42,24.54,2.15,19.31
+"Manhattan","Upper West Side South",439958,9734722.86,22.13,2.05,20.97
+"Manhattan","West Chelsea/Hudson Yards",363350,9140080.98,25.16,2.28,18.83
+"Manhattan","Clinton East",376799,9076781.8,24.09,2.22,18.82
+"Manhattan","Lenox Hill West",377998,8182040.11,21.65,1.94,20.26
+"Manhattan","Gramercy",322718,7465624.14,23.13,2.05,20.1
+"Manhattan","West Village",311587,7364550.54,23.64,2.03,20.5

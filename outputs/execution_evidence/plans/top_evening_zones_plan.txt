@@ -1,0 +1,90 @@
+== Physical Plan ==
+AdaptiveSparkPlan (8)
++- TakeOrderedAndProject (7)
+   +- HashAggregate (6)
+      +- Exchange (5)
+         +- HashAggregate (4)
+            +- Project (3)
+               +- Filter (2)
+                  +- Scan parquet  (1)
+
+
+(1) Scan parquet
+Output [9]: [pickup_hour#511, pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519, pickup_month#525]
+Batched: true
+Location: InMemoryFileIndex [file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-processing-pipeline/artifacts/run/results/zone_hour_metrics.parquet]
+PushedFilters: [IsNotNull(pickup_hour), IsNotNull(pickup_zone), GreaterThanOrEqual(pickup_hour,17), LessThanOrEqual(pickup_hour,20), Not(EqualTo(pickup_zone,Unknown))]
+ReadSchema: struct<pickup_hour:int,pickup_borough:string,pickup_zone:string,trip_count:bigint,gross_revenue:double,fare_revenue:double,tip_revenue:double,avg_distance_miles:double>
+
+(2) Filter
+Input [9]: [pickup_hour#511, pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519, pickup_month#525]
+Condition : ((((isnotnull(pickup_hour#511) AND isnotnull(pickup_zone#513)) AND (pickup_hour#511 >= 17)) AND (pickup_hour#511 <= 20)) AND NOT (pickup_zone#513 = Unknown))
+
+(3) Project
+Output [7]: [pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519]
+Input [9]: [pickup_hour#511, pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519, pickup_month#525]
+
+(4) HashAggregate
+Input [7]: [pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519]
+Keys [2]: [pickup_borough#512, pickup_zone#513]
+Functions [5]: [partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_avg(avg_distance_miles#519), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)]
+Aggregate Attributes [6]: [sum#590L, sum#591, sum#592, count#593L, sum#594, sum#595]
+Results [8]: [pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601]
+
+(5) Exchange
+Input [8]: [pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601]
+Arguments: hashpartitioning(pickup_borough#512, pickup_zone#513, 48), ENSURE_REQUIREMENTS, [plan_id=441]
+
+(6) HashAggregate
+Input [8]: [pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601]
+Keys [2]: [pickup_borough#512, pickup_zone#513]
+Functions [5]: [sum(trip_count#515L), sum(gross_revenue#516), avg(avg_distance_miles#519), sum(tip_revenue#518), sum(fare_revenue#517)]
+Aggregate Attributes [5]: [sum(trip_count#515L)#548L, sum(gross_revenue#516)#549, avg(avg_distance_miles#519)#552, sum(tip_revenue#518)#553, sum(fare_revenue#517)#554]
+Results [7]: [pickup_borough#512, pickup_zone#513, sum(trip_count#515L)#548L AS total_trips#543L, round(sum(gross_revenue#516)#549, 2) AS gross_revenue#544, round((sum(gross_revenue#516)#549 / cast(sum(trip_count#515L)#548L as double)), 2) AS revenue_per_trip#545, round(avg(avg_distance_miles#519)#552, 2) AS avg_distance_miles#546, round(((100.0 * sum(tip_revenue#518)#553) / sum(fare_revenue#517)#554), 2) AS tip_pct_of_fare#547]
+
+(7) TakeOrderedAndProject
+Input [7]: [pickup_borough#512, pickup_zone#513, total_trips#543L, gross_revenue#544, revenue_per_trip#545, avg_distance_miles#546, tip_pct_of_fare#547]
+Arguments: 20, [gross_revenue#544 DESC NULLS LAST], [pickup_borough#512, pickup_zone#513, total_trips#543L, gross_revenue#544, revenue_per_trip#545, avg_distance_miles#546, tip_pct_of_fare#547]
+
+(8) AdaptiveSparkPlan
+Output [7]: [pickup_borough#512, pickup_zone#513, total_trips#543L, gross_revenue#544, revenue_per_trip#545, avg_distance_miles#546, tip_pct_of_fare#547]
+Arguments: isFinalPlan=false
+
+
+== Parsed Logical Plan ==
+'GlobalLimit 20
++- 'LocalLimit 20
+   +- 'Sort ['gross_revenue DESC NULLS LAST], true
+      +- 'Aggregate ['pickup_borough, 'pickup_zone], ['pickup_borough, 'pickup_zone, 'SUM('trip_count) AS total_trips#543, 'ROUND('SUM('gross_revenue), 2) AS gross_revenue#544, 'ROUND(('SUM('gross_revenue) / 'SUM('trip_count)), 2) AS revenue_per_trip#545, 'ROUND('AVG('avg_distance_miles), 2) AS avg_distance_miles#546, 'ROUND(((100 * 'SUM('tip_revenue)) / 'SUM('fare_revenue)), 2) AS tip_pct_of_fare#547]
+         +- 'Filter ((('pickup_hour >= 17) AND ('pickup_hour <= 20)) AND NOT ('pickup_zone = Unknown))
+            +- 'UnresolvedRelation [zone_hour_metrics], [], false
+
+== Analyzed Logical Plan ==
+pickup_borough: string, pickup_zone: string, total_trips: bigint, gross_revenue: double, revenue_per_trip: double, avg_distance_miles: double, tip_pct_of_fare: double
+GlobalLimit 20
++- LocalLimit 20
+   +- Sort [gross_revenue#544 DESC NULLS LAST], true
+      +- Aggregate [pickup_borough#512, pickup_zone#513], [pickup_borough#512, pickup_zone#513, sum(trip_count#515L) AS total_trips#543L, round(sum(gross_revenue#516), 2) AS gross_revenue#544, round((sum(gross_revenue#516) / cast(sum(trip_count#515L) as double)), 2) AS revenue_per_trip#545, round(avg(avg_distance_miles#519), 2) AS avg_distance_miles#546, round(((cast(100 as double) * sum(tip_revenue#518)) / sum(fare_revenue#517)), 2) AS tip_pct_of_fare#547]
+         +- Filter (((pickup_hour#511 >= 17) AND (pickup_hour#511 <= 20)) AND NOT (pickup_zone#513 = Unknown))
+            +- SubqueryAlias zone_hour_metrics
+               +- View (`zone_hour_metrics`, [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525])
+                  +- Relation [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525] parquet
+
+== Optimized Logical Plan ==
+GlobalLimit 20
++- LocalLimit 20
+   +- Sort [gross_revenue#544 DESC NULLS LAST], true
+      +- Aggregate [pickup_borough#512, pickup_zone#513], [pickup_borough#512, pickup_zone#513, sum(trip_count#515L) AS total_trips#543L, round(sum(gross_revenue#516), 2) AS gross_revenue#544, round((sum(gross_revenue#516) / cast(sum(trip_count#515L) as double)), 2) AS revenue_per_trip#545, round(avg(avg_distance_miles#519), 2) AS avg_distance_miles#546, round(((100.0 * sum(tip_revenue#518)) / sum(fare_revenue#517)), 2) AS tip_pct_of_fare#547]
+         +- Project [pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519]
+            +- Filter ((isnotnull(pickup_hour#511) AND isnotnull(pickup_zone#513)) AND (((pickup_hour#511 >= 17) AND (pickup_hour#511 <= 20)) AND NOT (pickup_zone#513 = Unknown)))
+               +- Relation [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- TakeOrderedAndProject(limit=20, orderBy=[gross_revenue#544 DESC NULLS LAST], output=[pickup_borough#512,pickup_zone#513,total_trips#543L,gross_revenue#544,revenue_per_trip#545,avg_distance_miles#546,tip_pct_of_fare#547])
+   +- HashAggregate(keys=[pickup_borough#512, pickup_zone#513], functions=[sum(trip_count#515L), sum(gross_revenue#516), avg(avg_distance_miles#519), sum(tip_revenue#518), sum(fare_revenue#517)], output=[pickup_borough#512, pickup_zone#513, total_trips#543L, gross_revenue#544, revenue_per_trip#545, avg_distance_miles#546, tip_pct_of_fare#547])
+      +- Exchange hashpartitioning(pickup_borough#512, pickup_zone#513, 48), ENSURE_REQUIREMENTS, [plan_id=441]
+         +- HashAggregate(keys=[pickup_borough#512, pickup_zone#513], functions=[partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_avg(avg_distance_miles#519), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)], output=[pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601])
+            +- Project [pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519]
+               +- Filter ((((isnotnull(pickup_hour#511) AND isnotnull(pickup_zone#513)) AND (pickup_hour#511 >= 17)) AND (pickup_hour#511 <= 20)) AND NOT (pickup_zone#513 = Unknown))
+                  +- FileScan parquet [pickup_hour#511,pickup_borough#512,pickup_zone#513,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,pickup_month#525] Batched: true, DataFilters: [isnotnull(pickup_hour#511), isnotnull(pickup_zone#513), (pickup_hour#511 >= 17), (pickup_hour#51..., Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-proces..., PartitionFilters: [], PushedFilters: [IsNotNull(pickup_hour), IsNotNull(pickup_zone), GreaterThanOrEqual(pickup_hour,17), LessThanOrEq..., ReadSchema: struct<pickup_hour:int,pickup_borough:string,pickup_zone:string,trip_count:bigint,gross_revenue:d...
