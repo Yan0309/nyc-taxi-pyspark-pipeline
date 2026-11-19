@@ -1,19 +1,30 @@
-14:08:52 | INFO    | Source: 20 Parquet files, 1.046 GiB compressed
-14:08:55 | INFO    | Building and writing zone-hour metrics ...
-14:09:54 | INFO    | Building and writing zone-hour metrics completed in 58.72 seconds
-14:09:54 | INFO    | Running full-table SQL without cache ...
-14:09:55 | INFO    | Running full-table SQL without cache completed in 1.00 seconds
-14:09:56 | INFO    | Materializing zone-hour metrics cache ...
-14:09:58 | INFO    | Materializing zone-hour metrics cache completed in 2.50 seconds
-14:09:58 | INFO    | Running full-table SQL from cache ...
-14:09:59 | INFO    | Running full-table SQL from cache completed in 0.53 seconds
-14:09:59 | INFO    | Writing top evening zones ...
-14:09:59 | INFO    | Writing top evening zones completed in 0.63 seconds
-14:09:59 | INFO    | Writing daily borough metrics ...
-14:10:00 | INFO    | Writing daily borough metrics completed in 1.05 seconds
-14:10:00 | INFO    | Summarizing analytical metrics ...
-14:10:01 | INFO    | Summarizing analytical metrics completed in 0.54 seconds
-14:10:01 | INFO    | Clean trips summarized: 63,510,285
-14:10:01 | INFO    | Results: artifacts/run/results
-14:10:01 | INFO    | Manifest: artifacts/run/run_manifest.json
-14:10:01 | INFO    | Spark UI: http://localhost:4040
+11:58:04 | INFO    | Source: 20 Parquet files, 1.046 GiB compressed
+11:58:06 | INFO    | Building and writing zone-hour metrics ...
+11:59:02 | INFO    | Building and writing zone-hour metrics completed in 56.53 seconds
+11:59:03 | INFO    | Writing top evening zones ...
+11:59:03 | INFO    | Writing top evening zones completed in 0.42 seconds
+11:59:03 | INFO    | Writing daily borough metrics ...
+11:59:04 | INFO    | Writing daily borough metrics completed in 0.67 seconds
+11:59:04 | INFO    | Writing partition-pruned monthly hourly demand ...
+11:59:04 | INFO    | Writing partition-pruned monthly hourly demand completed in 0.43 seconds
+11:59:05 | INFO    | Full-table SQL without cache run 1/5: 0.291 seconds
+11:59:05 | INFO    | Full-table SQL without cache run 2/5: 0.271 seconds
+11:59:05 | INFO    | Full-table SQL without cache run 3/5: 0.275 seconds
+11:59:05 | INFO    | Full-table SQL without cache run 4/5: 0.251 seconds
+11:59:06 | INFO    | Full-table SQL without cache run 5/5: 0.207 seconds
+11:59:06 | INFO    | Full-table SQL without cache median over 5 runs: 0.271 seconds
+11:59:06 | INFO    | Materializing zone-hour metrics cache ...
+11:59:08 | INFO    | Materializing zone-hour metrics cache completed in 1.95 seconds
+11:59:08 | INFO    | Full-table SQL from cache run 1/5: 0.468 seconds
+11:59:08 | INFO    | Full-table SQL from cache run 2/5: 0.264 seconds
+11:59:09 | INFO    | Full-table SQL from cache run 3/5: 0.190 seconds
+11:59:09 | INFO    | Full-table SQL from cache run 4/5: 0.260 seconds
+11:59:09 | INFO    | Full-table SQL from cache run 5/5: 0.613 seconds
+11:59:09 | INFO    | Full-table SQL from cache median over 5 runs: 0.264 seconds
+11:59:09 | INFO    | Summarizing analytical metrics ...
+11:59:10 | INFO    | Summarizing analytical metrics completed in 0.45 seconds
+11:59:10 | INFO    | Clean trips summarized: 63,510,285
+11:59:10 | INFO    | Results: artifacts/run/results
+11:59:10 | INFO    | Manifest: artifacts/run/run_manifest.json
+11:59:10 | INFO    | Spark UI: http://localhost:4040
+11:59:10 | INFO    | Keeping Spark UI alive for 900 seconds for screenshot capture

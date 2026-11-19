@@ -36,6 +36,24 @@ GROUP BY pickup_date, pickup_borough
 ORDER BY pickup_date, pickup_borough
 """
 
+PARTITION_PRUNED_MONTH = "2024-07"
+
+# Filters on the partition column, so Spark reads only one of the 20
+# pickup_month=... directories. The plan shows this under PartitionFilters.
+MONTHLY_HOURLY_DEMAND_SQL = f"""
+SELECT
+    pickup_month,
+    pickup_borough,
+    pickup_hour,
+    SUM(trip_count) AS trip_count,
+    ROUND(SUM(gross_revenue), 2) AS gross_revenue,
+    ROUND(SUM(gross_revenue) / SUM(trip_count), 2) AS revenue_per_trip
+FROM zone_hour_metrics
+WHERE pickup_month = '{PARTITION_PRUNED_MONTH}'
+GROUP BY pickup_month, pickup_borough, pickup_hour
+ORDER BY pickup_borough, pickup_hour
+"""
+
 CACHE_BENCHMARK_SQL = """
 SELECT
     pickup_month,

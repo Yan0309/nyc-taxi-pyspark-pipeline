@@ -3,8 +3,10 @@
 
 from __future__ import annotations
 
+import io
 import logging
 import sys
+from contextlib import redirect_stdout
 from pathlib import Path
 
 from pyspark.sql import functions as F
@@ -61,7 +63,14 @@ def main() -> int:
             "No data was read because transformations only update the logical plan."
         )
         logger.info("\nPhysical plan before an action:")
-        transformed.explain(mode="formatted")
+        plan_buffer = io.StringIO()
+        with redirect_stdout(plan_buffer):
+            transformed.explain(mode="formatted")
+        logger.info(plan_buffer.getvalue().rstrip())
+        logger.info(
+            "Jobs after explain(): %d (explain only plans; it runs nothing)",
+            len(tracker.getJobIdsForGroup()),
+        )
 
         logger.info("\nCalling take(5) to trigger an eager action ...")
         rows = transformed.take(5)

@@ -1,0 +1,78 @@
+== Physical Plan ==
+AdaptiveSparkPlan (7)
++- Sort (6)
+   +- Exchange (5)
+      +- HashAggregate (4)
+         +- Exchange (3)
+            +- HashAggregate (2)
+               +- Scan parquet  (1)
+
+
+(1) Scan parquet
+Output [5]: [pickup_hour#511, pickup_borough#512, trip_count#515L, gross_revenue#516, pickup_month#525]
+Batched: true
+Location: InMemoryFileIndex [file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-processing-pipeline/artifacts/run/results/zone_hour_metrics.parquet]
+PartitionFilters: [isnotnull(pickup_month#525), (pickup_month#525 = 2024-07)]
+ReadSchema: struct<pickup_hour:int,pickup_borough:string,trip_count:bigint,gross_revenue:double>
+
+(2) HashAggregate
+Input [5]: [pickup_hour#511, pickup_borough#512, trip_count#515L, gross_revenue#516, pickup_month#525]
+Keys [3]: [pickup_month#525, pickup_borough#512, pickup_hour#511]
+Functions [2]: [partial_sum(trip_count#515L), partial_sum(gross_revenue#516)]
+Aggregate Attributes [2]: [sum#627L, sum#628]
+Results [5]: [pickup_month#525, pickup_borough#512, pickup_hour#511, sum#629L, sum#630]
+
+(3) Exchange
+Input [5]: [pickup_month#525, pickup_borough#512, pickup_hour#511, sum#629L, sum#630]
+Arguments: hashpartitioning(pickup_month#525, pickup_borough#512, pickup_hour#511, 48), ENSURE_REQUIREMENTS, [plan_id=483]
+
+(4) HashAggregate
+Input [5]: [pickup_month#525, pickup_borough#512, pickup_hour#511, sum#629L, sum#630]
+Keys [3]: [pickup_month#525, pickup_borough#512, pickup_hour#511]
+Functions [2]: [sum(trip_count#515L), sum(gross_revenue#516)]
+Aggregate Attributes [2]: [sum(trip_count#515L)#584L, sum(gross_revenue#516)#585]
+Results [6]: [pickup_month#525, pickup_borough#512, pickup_hour#511, sum(trip_count#515L)#584L AS trip_count#581L, round(sum(gross_revenue#516)#585, 2) AS gross_revenue#582, round((sum(gross_revenue#516)#585 / cast(sum(trip_count#515L)#584L as double)), 2) AS revenue_per_trip#583]
+
+(5) Exchange
+Input [6]: [pickup_month#525, pickup_borough#512, pickup_hour#511, trip_count#581L, gross_revenue#582, revenue_per_trip#583]
+Arguments: rangepartitioning(pickup_borough#512 ASC NULLS FIRST, pickup_hour#511 ASC NULLS FIRST, 48), ENSURE_REQUIREMENTS, [plan_id=486]
+
+(6) Sort
+Input [6]: [pickup_month#525, pickup_borough#512, pickup_hour#511, trip_count#581L, gross_revenue#582, revenue_per_trip#583]
+Arguments: [pickup_borough#512 ASC NULLS FIRST, pickup_hour#511 ASC NULLS FIRST], true, 0
+
+(7) AdaptiveSparkPlan
+Output [6]: [pickup_month#525, pickup_borough#512, pickup_hour#511, trip_count#581L, gross_revenue#582, revenue_per_trip#583]
+Arguments: isFinalPlan=false
+
+
+== Parsed Logical Plan ==
+'Sort ['pickup_borough ASC NULLS FIRST, 'pickup_hour ASC NULLS FIRST], true
++- 'Aggregate ['pickup_month, 'pickup_borough, 'pickup_hour], ['pickup_month, 'pickup_borough, 'pickup_hour, 'SUM('trip_count) AS trip_count#581, 'ROUND('SUM('gross_revenue), 2) AS gross_revenue#582, 'ROUND(('SUM('gross_revenue) / 'SUM('trip_count)), 2) AS revenue_per_trip#583]
+   +- 'Filter ('pickup_month = 2024-07)
+      +- 'UnresolvedRelation [zone_hour_metrics], [], false
+
+== Analyzed Logical Plan ==
+pickup_month: string, pickup_borough: string, pickup_hour: int, trip_count: bigint, gross_revenue: double, revenue_per_trip: double
+Sort [pickup_borough#512 ASC NULLS FIRST, pickup_hour#511 ASC NULLS FIRST], true
++- Aggregate [pickup_month#525, pickup_borough#512, pickup_hour#511], [pickup_month#525, pickup_borough#512, pickup_hour#511, sum(trip_count#515L) AS trip_count#581L, round(sum(gross_revenue#516), 2) AS gross_revenue#582, round((sum(gross_revenue#516) / cast(sum(trip_count#515L) as double)), 2) AS revenue_per_trip#583]
+   +- Filter (pickup_month#525 = 2024-07)
+      +- SubqueryAlias zone_hour_metrics
+         +- View (`zone_hour_metrics`, [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525])
+            +- Relation [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525] parquet
+
+== Optimized Logical Plan ==
+Sort [pickup_borough#512 ASC NULLS FIRST, pickup_hour#511 ASC NULLS FIRST], true
++- Aggregate [pickup_month#525, pickup_borough#512, pickup_hour#511], [pickup_month#525, pickup_borough#512, pickup_hour#511, sum(trip_count#515L) AS trip_count#581L, round(sum(gross_revenue#516), 2) AS gross_revenue#582, round((sum(gross_revenue#516) / cast(sum(trip_count#515L) as double)), 2) AS revenue_per_trip#583]
+   +- Project [pickup_hour#511, pickup_borough#512, trip_count#515L, gross_revenue#516, pickup_month#525]
+      +- Filter (isnotnull(pickup_month#525) AND (pickup_month#525 = 2024-07))
+         +- Relation [pickup_date#509,pickup_weekday#510,pickup_hour#511,pickup_borough#512,pickup_zone#513,pickup_service_zone#514,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,avg_duration_minutes#520,avg_speed_mph#521,airport_trips#522L,avg_revenue_per_trip#523,tip_pct_of_fare#524,pickup_month#525] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [pickup_borough#512 ASC NULLS FIRST, pickup_hour#511 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(pickup_borough#512 ASC NULLS FIRST, pickup_hour#511 ASC NULLS FIRST, 48), ENSURE_REQUIREMENTS, [plan_id=486]
+      +- HashAggregate(keys=[pickup_month#525, pickup_borough#512, pickup_hour#511], functions=[sum(trip_count#515L), sum(gross_revenue#516)], output=[pickup_month#525, pickup_borough#512, pickup_hour#511, trip_count#581L, gross_revenue#582, revenue_per_trip#583])
+         +- Exchange hashpartitioning(pickup_month#525, pickup_borough#512, pickup_hour#511, 48), ENSURE_REQUIREMENTS, [plan_id=483]
+            +- HashAggregate(keys=[pickup_month#525, pickup_borough#512, pickup_hour#511], functions=[partial_sum(trip_count#515L), partial_sum(gross_revenue#516)], output=[pickup_month#525, pickup_borough#512, pickup_hour#511, sum#629L, sum#630])
+               +- FileScan parquet [pickup_hour#511,pickup_borough#512,trip_count#515L,gross_revenue#516,pickup_month#525] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-proces..., PartitionFilters: [isnotnull(pickup_month#525), (pickup_month#525 = 2024-07)], PushedFilters: [], ReadSchema: struct<pickup_hour:int,pickup_borough:string,trip_count:bigint,gross_revenue:double>

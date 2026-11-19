@@ -29,15 +29,15 @@ Input [9]: [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#
 Input [8]: [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L]
 Keys [2]: [pickup_date#509, pickup_borough#512]
 Functions [6]: [partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_sum(airport_trips#522L), partial_sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)]
-Aggregate Attributes [6]: [sum#602L, sum#603, sum#604L, sum#605, sum#606, sum#607]
-Results [8]: [pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613]
+Aggregate Attributes [6]: [sum#615L, sum#616, sum#617L, sum#618, sum#619, sum#620]
+Results [8]: [pickup_date#509, pickup_borough#512, sum#621L, sum#622, sum#623L, sum#624, sum#625, sum#626]
 
 (5) Exchange
-Input [8]: [pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613]
+Input [8]: [pickup_date#509, pickup_borough#512, sum#621L, sum#622, sum#623L, sum#624, sum#625, sum#626]
 Arguments: hashpartitioning(pickup_date#509, pickup_borough#512, 48), ENSURE_REQUIREMENTS, [plan_id=463]
 
 (6) HashAggregate
-Input [8]: [pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613]
+Input [8]: [pickup_date#509, pickup_borough#512, sum#621L, sum#622, sum#623L, sum#624, sum#625, sum#626]
 Keys [2]: [pickup_date#509, pickup_borough#512]
 Functions [6]: [sum(trip_count#515L), sum(gross_revenue#516), sum(airport_trips#522L), sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), sum(tip_revenue#518), sum(fare_revenue#517)]
 Aggregate Attributes [6]: [sum(trip_count#515L)#567L, sum(gross_revenue#516)#568, sum(airport_trips#522L)#569L, sum((cast(trip_count#515L as double) * avg_duration_minutes#520))#573, sum(tip_revenue#518)#571, sum(fare_revenue#517)#572]
@@ -84,7 +84,7 @@ AdaptiveSparkPlan isFinalPlan=false
    +- Exchange rangepartitioning(pickup_date#509 ASC NULLS FIRST, pickup_borough#512 ASC NULLS FIRST, 48), ENSURE_REQUIREMENTS, [plan_id=466]
       +- HashAggregate(keys=[pickup_date#509, pickup_borough#512], functions=[sum(trip_count#515L), sum(gross_revenue#516), sum(airport_trips#522L), sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), sum(tip_revenue#518), sum(fare_revenue#517)], output=[pickup_date#509, pickup_borough#512, trip_count#562L, gross_revenue#563, airport_trips#564L, weighted_avg_duration_minutes#565, tip_pct_of_fare#566])
          +- Exchange hashpartitioning(pickup_date#509, pickup_borough#512, 48), ENSURE_REQUIREMENTS, [plan_id=463]
-            +- HashAggregate(keys=[pickup_date#509, pickup_borough#512], functions=[partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_sum(airport_trips#522L), partial_sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)], output=[pickup_date#509, pickup_borough#512, sum#608L, sum#609, sum#610L, sum#611, sum#612, sum#613])
+            +- HashAggregate(keys=[pickup_date#509, pickup_borough#512], functions=[partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_sum(airport_trips#522L), partial_sum((cast(trip_count#515L as double) * avg_duration_minutes#520)), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)], output=[pickup_date#509, pickup_borough#512, sum#621L, sum#622, sum#623L, sum#624, sum#625, sum#626])
                +- Project [pickup_date#509, pickup_borough#512, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_duration_minutes#520, airport_trips#522L]
                   +- Filter ((isnotnull(pickup_date#509) AND (pickup_date#509 >= 2023-05-01)) AND (pickup_date#509 < 2025-01-01))
                      +- FileScan parquet [pickup_date#509,pickup_borough#512,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_duration_minutes#520,airport_trips#522L,pickup_month#525] Batched: true, DataFilters: [isnotnull(pickup_date#509), (pickup_date#509 >= 2023-05-01), (pickup_date#509 < 2025-01-01)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-proces..., PartitionFilters: [], PushedFilters: [IsNotNull(pickup_date), GreaterThanOrEqual(pickup_date,2023-05-01), LessThan(pickup_date,2025-01..., ReadSchema: struct<pickup_date:date,pickup_borough:string,trip_count:bigint,gross_revenue:double,fare_revenue...

@@ -28,15 +28,15 @@ Input [9]: [pickup_hour#511, pickup_borough#512, pickup_zone#513, trip_count#515
 Input [7]: [pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519]
 Keys [2]: [pickup_borough#512, pickup_zone#513]
 Functions [5]: [partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_avg(avg_distance_miles#519), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)]
-Aggregate Attributes [6]: [sum#590L, sum#591, sum#592, count#593L, sum#594, sum#595]
-Results [8]: [pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601]
+Aggregate Attributes [6]: [sum#603L, sum#604, sum#605, count#606L, sum#607, sum#608]
+Results [8]: [pickup_borough#512, pickup_zone#513, sum#609L, sum#610, sum#611, count#612L, sum#613, sum#614]
 
 (5) Exchange
-Input [8]: [pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601]
+Input [8]: [pickup_borough#512, pickup_zone#513, sum#609L, sum#610, sum#611, count#612L, sum#613, sum#614]
 Arguments: hashpartitioning(pickup_borough#512, pickup_zone#513, 48), ENSURE_REQUIREMENTS, [plan_id=441]
 
 (6) HashAggregate
-Input [8]: [pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601]
+Input [8]: [pickup_borough#512, pickup_zone#513, sum#609L, sum#610, sum#611, count#612L, sum#613, sum#614]
 Keys [2]: [pickup_borough#512, pickup_zone#513]
 Functions [5]: [sum(trip_count#515L), sum(gross_revenue#516), avg(avg_distance_miles#519), sum(tip_revenue#518), sum(fare_revenue#517)]
 Aggregate Attributes [5]: [sum(trip_count#515L)#548L, sum(gross_revenue#516)#549, avg(avg_distance_miles#519)#552, sum(tip_revenue#518)#553, sum(fare_revenue#517)#554]
@@ -84,7 +84,7 @@ AdaptiveSparkPlan isFinalPlan=false
 +- TakeOrderedAndProject(limit=20, orderBy=[gross_revenue#544 DESC NULLS LAST], output=[pickup_borough#512,pickup_zone#513,total_trips#543L,gross_revenue#544,revenue_per_trip#545,avg_distance_miles#546,tip_pct_of_fare#547])
    +- HashAggregate(keys=[pickup_borough#512, pickup_zone#513], functions=[sum(trip_count#515L), sum(gross_revenue#516), avg(avg_distance_miles#519), sum(tip_revenue#518), sum(fare_revenue#517)], output=[pickup_borough#512, pickup_zone#513, total_trips#543L, gross_revenue#544, revenue_per_trip#545, avg_distance_miles#546, tip_pct_of_fare#547])
       +- Exchange hashpartitioning(pickup_borough#512, pickup_zone#513, 48), ENSURE_REQUIREMENTS, [plan_id=441]
-         +- HashAggregate(keys=[pickup_borough#512, pickup_zone#513], functions=[partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_avg(avg_distance_miles#519), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)], output=[pickup_borough#512, pickup_zone#513, sum#596L, sum#597, sum#598, count#599L, sum#600, sum#601])
+         +- HashAggregate(keys=[pickup_borough#512, pickup_zone#513], functions=[partial_sum(trip_count#515L), partial_sum(gross_revenue#516), partial_avg(avg_distance_miles#519), partial_sum(tip_revenue#518), partial_sum(fare_revenue#517)], output=[pickup_borough#512, pickup_zone#513, sum#609L, sum#610, sum#611, count#612L, sum#613, sum#614])
             +- Project [pickup_borough#512, pickup_zone#513, trip_count#515L, gross_revenue#516, fare_revenue#517, tip_revenue#518, avg_distance_miles#519]
                +- Filter ((((isnotnull(pickup_hour#511) AND isnotnull(pickup_zone#513)) AND (pickup_hour#511 >= 17)) AND (pickup_hour#511 <= 20)) AND NOT (pickup_zone#513 = Unknown))
                   +- FileScan parquet [pickup_hour#511,pickup_borough#512,pickup_zone#513,trip_count#515L,gross_revenue#516,fare_revenue#517,tip_revenue#518,avg_distance_miles#519,pickup_month#525] Batched: true, DataFilters: [isnotnull(pickup_hour#511), isnotnull(pickup_zone#513), (pickup_hour#511 >= 17), (pickup_hour#51..., Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/Users/yan/Documents/Codex/2026-11-18/build-a-pyspark-data-proces..., PartitionFilters: [], PushedFilters: [IsNotNull(pickup_hour), IsNotNull(pickup_zone), GreaterThanOrEqual(pickup_hour,17), LessThanOrEq..., ReadSchema: struct<pickup_hour:int,pickup_borough:string,pickup_zone:string,trip_count:bigint,gross_revenue:d...

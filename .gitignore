@@ -6,6 +6,7 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+work/
 
 # Downloaded source data is reproducible and should not be committed.
 data/raw/*.parquet
@@ -20,3 +21,4 @@ derby.log
 
 # Keep only reviewed report assets under docs.
 docs/*.html
+outputs/*.zip

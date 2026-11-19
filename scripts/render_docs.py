@@ -165,7 +165,7 @@ def render_plan(manifest: dict, output: Path) -> None:
         <div class="fact">
           <div class="fact-label">Adaptive plan</div>
           <div class="fact-value">AQE coalescing enabled</div>
-          <div class="fact-code">Final UI query plan shows AQEShuffleRead coalesced.</div>
+          <div class="fact-code">AQE re-optimizes shuffle partitions at runtime.</div>
         </div>
       </aside>
     </section>

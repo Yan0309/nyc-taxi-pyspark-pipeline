@@ -4,7 +4,10 @@ import pytest
 from pyspark.sql import Row, SparkSession
 from pyspark.sql import functions as F
 
-from taxi_pipeline.analytics import TOP_EVENING_ZONES_SQL
+from taxi_pipeline.analytics import (
+    MONTHLY_HOURLY_DEMAND_SQL,
+    TOP_EVENING_ZONES_SQL,
+)
 from taxi_pipeline.spark_session import build_spark_session
 from taxi_pipeline.transform import (
     add_trip_measures,
@@ -159,3 +162,22 @@ def test_zone_metrics_and_sql(spark):
     assert len(rows) == 2
     assert rows[0].pickup_zone == "JFK"
     assert rows[0].gross_revenue == 25.0
+
+
+def test_monthly_query_prunes_partitions(spark, tmp_path):
+    clean = add_trip_measures(
+        apply_early_filters(select_source_columns(source_frame(spark)))
+    )
+    metrics = build_zone_hour_metrics(join_zone_lookup(clean, zone_frame(spark)))
+    path = str(tmp_path / "zone_hour_metrics")
+    metrics.write.partitionBy("pickup_month").parquet(path)
+
+    spark.read.parquet(path).createOrReplaceTempView("zone_hour_metrics")
+    query = spark.sql(MONTHLY_HOURLY_DEMAND_SQL)
+    plan = query._jdf.queryExecution().executedPlan().toString()
+
+    assert "PartitionFilters: [isnotnull(pickup_month" in plan
+    assert "(pickup_month" in plan and "= 2024-07)" in plan
+    rows = query.collect()
+    assert {row.pickup_month for row in rows} == {"2024-07"}
+    assert sum(row.trip_count for row in rows) == 1
